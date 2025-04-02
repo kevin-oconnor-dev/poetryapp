@@ -31,12 +31,12 @@ async function getPoem(author) {
         poemElement.innerText = 'Failed to load poem';
     }
 }
-let typeAllow = true;
-let typeInProgress = false;
+
 function typeText(poemLines) {
     let print = '';
     let lineIndex = 0;
     let charIndex = 0;
+    let variedSpeed = Math.floor(Math.random() * (70 - 60 + 1) + 60);
     function type() {
         if (typeAllow && lineIndex < poemLines.length) {
             typeInProgress = true;
@@ -47,9 +47,11 @@ function typeText(poemLines) {
                 print += '\n';
                 charIndex = 0;
                 lineIndex++;
+                variedSpeed = Math.floor(Math.random() * (70 - 60 + 1) + 60);
             }
             poemElement.innerText = print;
-            setTimeout(type, 70);
+            
+            setTimeout(type, variedSpeed);
         }
     }
     type();
