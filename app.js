@@ -4,7 +4,9 @@ let poemTitle = '';
 
 async function getPoem(author) {
     if (!author) {
-        await makeDatalist();
+        if (!datalistAuthors) {
+            await makeDatalist();
+        }
         author = pickRandomAuthor();
     } 
     let url = `https://poetrydb.org/author/${author}`;
@@ -31,15 +33,16 @@ async function getPoem(author) {
         poemElement.innerText = 'Failed to load poem';
     }
 }
-
+let timerId;
+let currentlyTyping = false;
 function typeText(poemLines) {
     let print = '';
     let lineIndex = 0;
     let charIndex = 0;
     let variedSpeed = Math.floor(Math.random() * (70 - 60 + 1) + 60);
     function type() {
-        if (typeAllow && lineIndex < poemLines.length) {
-            typeInProgress = true;
+        if (lineIndex < poemLines.length) {
+            currentlyTyping = true;
             if (charIndex < poemLines[lineIndex].length) {
                 print += poemLines[lineIndex][charIndex];
                 charIndex++;
@@ -51,11 +54,11 @@ function typeText(poemLines) {
             }
             poemElement.innerText = print;
             
-            setTimeout(type, variedSpeed);
+            timerId = setTimeout(type, variedSpeed);
         }
     }
     type();
-    typeInProgress = false;
+    currentlyTyping = false;
 }
 
 function pickRandomAuthor() {
@@ -67,6 +70,7 @@ function pickRandomAuthor() {
     return datalistAuthors[random];
 }
 async function randomPress() {
+    if (currentlyTyping) clearTimeout(timerId);
     const randomButton = document.getElementById('random');
     randomButton.style.visibility = 'hidden';
     await getPoem();
@@ -78,6 +82,7 @@ function displayTitle() {
 }
 
 function lookPoet() {
+    if (currentlyTyping) clearTimeout(timerId);
     let input = document.getElementById('author');
     let userEntry = input.value;
     getPoem(userEntry);
