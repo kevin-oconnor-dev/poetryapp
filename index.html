@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="app.js"></script>
+    <title>Poetry API Practice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fascinate&family=Italianno&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    </style>
+</head>
+<body>
+    <h1>Poetry API</h1>
+    <h2 id="poem-title">Go ahead...</h2>
+    <div id="poem-box">
+        <p id="poetry">Enter an author or get a random poem!</p>
+    </div>
+    <p id="num"></p>
+    <div id="input-box">
+        <input list="datalist" id="author" type="text" placeholder="a famous poet...">
+        <button id="submit" onclick="lookPoet()">Enter</button>
+        <datalist id="datalist">
+        </datalist>
+        <button id="random" onclick="randomPress()">Random</button>
+    </div>
+</body>
+</html>

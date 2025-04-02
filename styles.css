@@ -1,0 +1,76 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: space-around;
+}
+button {
+    cursor: pointer;
+}
+h1 {
+    font-family: 'Fascinate';
+    margin: 2vw 0 0 2vw;
+}
+#poem-title {
+    margin: 2vw 0 1vw 0;
+    font-family: 'Italianno';
+    font-weight: normal;
+    font-size: clamp(30px, 7vw, 80px);
+    text-align: center;
+}
+
+#poetry {
+    font-size: 20px
+}
+#poem-box {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    padding: 1vw 2vw;
+    border-radius: 5px;
+    width: fit-content;
+    background-color: #DAB987;
+}
+#input-box {
+    display: flex;
+    margin: 2vw auto 0 auto;
+    padding: 2vw;
+    width: 100%;
+    background-color: #DAB987;
+    justify-content: center;
+    align-items: center;
+    gap: 1vw;
+}
+#num {
+    margin: 1vw 0 0 2vw;
+}
+#submit {
+    border: none;
+    border-radius: 5px;
+    padding: .5em;
+    max-height: 30px;
+}
+#random {
+    margin-left: 3vw;
+    border: none;
+    border-radius: 5px;
+    padding: .5em;
+    max-height: 30px;
+}
+#submit:hover, #random:hover {
+    background-color: #dedcdc
+}
+#submit:active, #random:active {
+    transform: scale(0.95);
+}
+#author {
+    padding: 1vw;
+    border: none;
+    border-radius: 5px;
+    max-height: 30px;
+}
