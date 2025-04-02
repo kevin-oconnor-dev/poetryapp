@@ -32,12 +32,14 @@ async function getPoem(author) {
     }
 }
 let typeAllow = true;
+let typeInProgress = false;
 function typeText(poemLines) {
     let print = '';
     let lineIndex = 0;
     let charIndex = 0;
     function type() {
         if (typeAllow && lineIndex < poemLines.length) {
+            typeInProgress = true;
             if (charIndex < poemLines[lineIndex].length) {
                 print += poemLines[lineIndex][charIndex];
                 charIndex++;
@@ -51,6 +53,7 @@ function typeText(poemLines) {
         }
     }
     type();
+    typeInProgress = false;
 }
 
 function pickRandomAuthor() {
@@ -62,7 +65,6 @@ function pickRandomAuthor() {
     return datalistAuthors[random];
 }
 async function randomPress() {
-    typeAllow = false;
     const randomButton = document.getElementById('random');
     randomButton.style.visibility = 'hidden';
     await getPoem();
@@ -74,7 +76,6 @@ function displayTitle() {
 }
 
 function lookPoet() {
-    typeAllow = false;
     let input = document.getElementById('author');
     let userEntry = input.value;
     getPoem(userEntry);
