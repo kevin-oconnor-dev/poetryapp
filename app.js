@@ -22,13 +22,37 @@ async function getPoem(author) {
         let poemAuthor = json[random].author;
 
         let poemLines = json[random].lines;
-            poemElement.innerText = poemLines; 
+
+        typeText(poemLines);
+
             poemNum.innerText = `${random + 1} of ${poemCount} (${poemAuthor})`;
     } catch (error) {
         console.error('Fetch error:', error);
         poemElement.innerText = 'Failed to load poem';
     }
 }
+let typeAllow = true;
+function typeText(poemLines) {
+    let print = '';
+    let lineIndex = 0;
+    let charIndex = 0;
+    function type() {
+        if (typeAllow && lineIndex < poemLines.length) {
+            if (charIndex < poemLines[lineIndex].length) {
+                print += poemLines[lineIndex][charIndex];
+                charIndex++;
+            } else {
+                print += '\n';
+                charIndex = 0;
+                lineIndex++;
+            }
+            poemElement.innerText = print;
+            setTimeout(type, 70);
+        }
+    }
+    type();
+}
+
 function pickRandomAuthor() {
     let length = datalistAuthors.length;
     console.log("length: " + length);
@@ -38,6 +62,7 @@ function pickRandomAuthor() {
     return datalistAuthors[random];
 }
 async function randomPress() {
+    typeAllow = false;
     const randomButton = document.getElementById('random');
     randomButton.style.visibility = 'hidden';
     await getPoem();
@@ -49,6 +74,7 @@ function displayTitle() {
 }
 
 function lookPoet() {
+    typeAllow = false;
     let input = document.getElementById('author');
     let userEntry = input.value;
     getPoem(userEntry);
@@ -86,18 +112,3 @@ console.log(datalistAuthors);
 
 makeDatalist();
 
-let print = '';
-function typeText() {
-    let length = poemLines.length;
-    let chars = poemLines.join('').length;
-    let count = 0;
-    for (let line of poemLines) {
-        line = line + '\n';
-    }
-    let charsActual = poemLines.join('');
-    if (count < chars) {
-        print += charsActual[count]
-        poemElement.innerText = print;
-    }
-    setInterval(typeText, 70);
-}
