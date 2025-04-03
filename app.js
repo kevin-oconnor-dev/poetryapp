@@ -47,6 +47,11 @@ function typeText(poemLines) {
             if (charIndex < poemLines[lineIndex].length) {
                 print += poemLines[lineIndex][charIndex];
                 charIndex++;
+            } 
+            else if (poemLines[lineIndex] === "") { // if line is blank, don't pause after it
+                print += '\n';
+                charIndex = 0;
+                lineIndex++;
             } else {
                 print += '\n';
                 charIndex = 0;
@@ -65,10 +70,7 @@ function typeText(poemLines) {
 
 function pickRandomAuthor() {
     let length = datalistAuthors.length;
-    console.log("length: " + length);
     let random = Math.floor( Math.random() * length );
-    console.log("random: " + random)
-    console.log("picked author from random: " + datalistAuthors[random]);
     return datalistAuthors[random];
 }
 async function randomPress() {
@@ -118,7 +120,6 @@ async function makeDatalist() {
         datalistAuthors.push(author);
     }
 }
-console.log(datalistAuthors);
 
 makeDatalist();
 
