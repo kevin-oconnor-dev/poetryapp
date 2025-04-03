@@ -35,11 +35,12 @@ async function getPoem(author) {
 }
 let timerId;
 let currentlyTyping = false;
+
 function typeText(poemLines) {
     let print = '';
     let lineIndex = 0;
     let charIndex = 0;
-    let variedSpeed = Math.floor(Math.random() * (70 - 60 + 1) + 60);
+    let variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
     function type() {
         if (lineIndex < poemLines.length) {
             currentlyTyping = true;
@@ -50,11 +51,12 @@ function typeText(poemLines) {
                 print += '\n';
                 charIndex = 0;
                 lineIndex++;
-                variedSpeed = Math.floor(Math.random() * (70 - 60 + 1) + 60);
+                variedSpeed = 300;
             }
             poemElement.innerText = print;
-            
+
             timerId = setTimeout(type, variedSpeed);
+            variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
         }
     }
     type();
