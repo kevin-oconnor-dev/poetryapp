@@ -1,6 +1,7 @@
 const poemElement = document.getElementById('poetry');
 const poemNum = document.getElementById('num');
 let poemTitle = '';
+const usedPoems = [];
 
 async function getPoem(author) {
     if (!author) {
@@ -16,10 +17,14 @@ async function getPoem(author) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        let poemCount = json.length;
+        let poemCount = json.length; // count of all the returned poems
 
-        let random = Math.floor(Math.random() * poemCount);
-        poemTitle = json[random].title;
+        do {
+            let random = Math.floor(Math.random() * poemCount);
+            poemTitle = json[random].title;
+        } while (usedPoems.contains(poemTitle));
+        usedPoems.push(poemTitle);
+        
         displayTitle();
         let poemAuthor = json[random].author;
 
@@ -33,6 +38,8 @@ async function getPoem(author) {
         poemElement.innerText = 'Failed to load poem';
     }
 }
+
+
 let timerId;
 let currentlyTyping = false;
 
@@ -121,5 +128,65 @@ async function makeDatalist() {
     }
 }
 
-makeDatalist();
+let appUI = {
+    randomButton: document.getElementById('random'),
+    enterButton: document.getElementById('submit'),
+    madlibsButton: document.getElementById('madlibs'),
+    goButton: document.createElement('button'),
+    cancelButton: document.createElement('button'),
+    inputAuthor: document.getElementById('author'),
+}
 
+function runMadlibs() {
+    createMadlibsUI();
+}
+function createMadlibsUI() {
+    appUI.randomButton.style.display = 'none';
+    appUI.enterButton.style.display = 'none';
+    appUI.madlibsButton.style.display = 'none';
+
+    appUI.goButton.innerText = 'Go';
+    appUI.goButton.id = 'madlibs-go';
+    appUI.goButton.style.display = 'block';
+    appUI.goButton.onclick = buildMadlibsPoem;
+
+    appUI.cancelButton.innerText = 'Cancel';
+    appUI.cancelButton.id = 'cancel-madlibs';
+    appUI.cancelButton.style.display = 'block';
+    appUI.cancelButton.onclick = cancelMadlibs;
+
+    const inputBox = document.getElementById('input-box');
+    if(!inputBox.contains(appUI.goButton)) {
+        inputBox.appendChild(appUI.goButton);
+    }
+    if(!inputBox.contains(appUI.cancelButton)) {
+        inputBox.appendChild(appUI.cancelButton);
+    }
+
+    appUI.inputAuthor.placeholder = '# of lines';
+    appUI.inputAuthor.type = 'number';
+    appUI.inputAuthor.removeAttribute('list');
+    appUI.inputAuthor.style.width = '13vw';
+}
+
+function buildMadlibsPoem() {
+    let lineNum = appUI.inputAuthor.value;
+    for (let i = 0; i <= lineNum; i++) {
+        let poem = getPoem()
+        let lineLength = poem.lines;
+    }
+
+}
+
+function cancelMadlibs() {
+    appUI.randomButton.style.display = 'block';
+    appUI.enterButton.style.display = 'block';
+    appUI.madlibsButton.style.display = 'block';
+    appUI.cancelButton.style.display = 'none';
+    appUI.goButton.style.display = 'none';
+    appUI.inputAuthor.placeholder = 'a famous poet...';
+    appUI.inputAuthor.type = 'text';
+    appUI.inputAuthor.setAttribute('list', 'datalist');
+    appUI.inputAuthor.style.removeProperty('width');
+}
+makeDatalist();

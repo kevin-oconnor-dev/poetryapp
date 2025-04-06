@@ -49,23 +49,20 @@ h1 {
 #num {
     margin: 1vw 0 0 2vw;
 }
-#submit {
+button {
     border: none;
-    border-radius: 5px;
-    padding: .5em;
+    padding: 0.5em;
     max-height: 30px;
+    border-radius: 5px;
 }
 #random {
-    margin-left: 3vw;
-    border: none;
-    border-radius: 5px;
-    padding: .5em;
-    max-height: 30px;
+    margin-left: 4vw;
+    margin-right: 1vw;
 }
-#submit:hover, #random:hover {
+button:hover {
     background-color: #dedcdc
 }
-#submit:active, #random:active {
+button:active {
     transform: scale(0.95);
 }
 #author {
@@ -73,4 +70,7 @@ h1 {
     border: none;
     border-radius: 5px;
     max-height: 30px;
+}
+#cancel-madlibs {
+    margin-left: 20vw;
 }
