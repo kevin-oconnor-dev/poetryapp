@@ -8,6 +8,7 @@ const appUI = {
     inputAuthor: document.getElementById('author'),
     poemElement: document.getElementById('poetry'),
     poemNum: document.getElementById('num'),
+    titleHeader: document.getElementById('poem-title'),
 }
 const typeStatus = {
     timerId: null,
@@ -62,8 +63,7 @@ function displayNumber(poemObj) {
     appUI.poemNum.innerText = `${poemObj.random + 1} of ${poemObj.poemCount} (${poemObj.author})`
 }
 function displayTitle(poemObj) {
-    let titleHeader = document.getElementById('poem-title');
-    titleHeader.innerText = poemObj.title;
+    appUI.titleHeader.innerText = poemObj.title;
 }
 
 function typeText(poemLines) {
@@ -112,7 +112,6 @@ async function randomPress() {
     randomButton.style.visibility = 'visible';
 }
 
-// appUI.enterButton.addEventListener('click', runPoetryMachine);
 async function runPoetryMachine() {
     if (typeStatus.typing) clearTimeout(typeStatus.timerId);
     let input = document.getElementById('author');
@@ -150,9 +149,6 @@ async function makeDatalist() {
     }
 }
 
-function runMadlibs() {
-    createMadlibsUI();
-}
 function createMadlibsUI() {
     appUI.randomButton.style.display = 'none';
     appUI.enterButton.style.display = 'none';
@@ -182,21 +178,47 @@ function createMadlibsUI() {
     appUI.inputAuthor.style.width = '13vw';
 }
 
-function buildMadlibsPoem() {
-    let lineNum = appUI.inputAuthor.value;
-    for (let i = 0; i <= lineNum; i++) {
-        let poem = getPoem()
-        let lineLength = poem.lines;
+async function getMadlibsPoem(lineNum) {
+    const assembledLines = [];
+    for (let i = 0; i < lineNum; i++) {
+        const poemObj = await getPoem();
+        const lineCount = poemObj['lines'].length
+        const random = 0;
+        let pickedLine = '';
+        if (i === 0 || i === lineNum - 1) {
+            do {
+                Math.floor(Math.random() * lineCount);
+                pickedLine = poemObj['lines'][random];
+            } while ( pickedLine === '' && pickedLine.length === 1);
+        } else { 
+            do { // allow line breaks between first and last lines
+                Math.floor(Math.random() * lineCount);
+                pickedLine = poemObj['lines'][random];
+            } while ( pickedLine === ''); 
+        }
+        assembledLines.push(pickedLine);
     }
-
+    console.log(assembledLines);
+    return assembledLines;
+}
+async function buildMadlibsPoem() {
+    let lineNum = appUI.inputAuthor.value;
+    appUI.inputAuthor.value = undefined;
+    appUI.titleHeader.style.visibility = 'hidden';
+    const arr = await getMadlibsPoem(lineNum);
+    typeText(arr);
 }
 
 function cancelMadlibs() {
+    appUI.titleHeader.style.visibility = 'visible';
+
     appUI.randomButton.style.display = 'block';
     appUI.enterButton.style.display = 'block';
     appUI.madlibsButton.style.display = 'block';
+
     appUI.cancelButton.style.display = 'none';
     appUI.goButton.style.display = 'none';
+
     appUI.inputAuthor.placeholder = 'a famous poet...';
     appUI.inputAuthor.type = 'text';
     appUI.inputAuthor.setAttribute('list', 'datalist');
