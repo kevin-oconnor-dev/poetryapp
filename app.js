@@ -150,6 +150,9 @@ async function makeDatalist() {
 }
 
 function createMadlibsUI() {
+    appUI.titleHeader.innerText = 'Madlibs!';
+    appUI.titleHeader.style.fontFamily = 'Barriecito';
+
     appUI.randomButton.style.display = 'none';
     appUI.enterButton.style.display = 'none';
     appUI.madlibsButton.style.display = 'none';
@@ -176,6 +179,7 @@ function createMadlibsUI() {
     appUI.inputAuthor.type = 'number';
     appUI.inputAuthor.removeAttribute('list');
     appUI.inputAuthor.style.width = '13vw';
+    appUI.inputAuthor.setAttribute('max','8');
 }
 
 async function getMadlibsPoem(lineNum) {
@@ -194,7 +198,7 @@ async function getMadlibsPoem(lineNum) {
             do { // allow line breaks between first and last lines
                 Math.floor(Math.random() * lineCount);
                 pickedLine = poemObj['lines'][random];
-            } while ( pickedLine === ''); 
+            } while ( pickedLine.length === 1); 
         }
         assembledLines.push(pickedLine);
     }
@@ -202,16 +206,23 @@ async function getMadlibsPoem(lineNum) {
     return assembledLines;
 }
 async function buildMadlibsPoem() {
+    if (typeStatus.typing) clearTimeout(typeStatus.timerId);
     let lineNum = appUI.inputAuthor.value;
-    appUI.inputAuthor.value = undefined;
-    appUI.titleHeader.style.visibility = 'hidden';
-    const arr = await getMadlibsPoem(lineNum);
-    typeText(arr);
+    if (lineNum > 8) {
+        alert('max length is 8!');
+    } else {
+        displayLoadingSign();
+        appUI.inputAuthor.value = undefined;
+        appUI.poemNum.style.visibility = 'hidden';
+        const arr = await getMadlibsPoem(lineNum);
+        typeText(arr);
+    }
 }
 
 function cancelMadlibs() {
-    appUI.titleHeader.style.visibility = 'visible';
-
+    appUI.titleHeader.style.fontFamily = 'Italianno';
+    appUI.titleHeader.innerText = 'Go ahead...';
+    
     appUI.randomButton.style.display = 'block';
     appUI.enterButton.style.display = 'block';
     appUI.madlibsButton.style.display = 'block';
@@ -223,5 +234,8 @@ function cancelMadlibs() {
     appUI.inputAuthor.type = 'text';
     appUI.inputAuthor.setAttribute('list', 'datalist');
     appUI.inputAuthor.style.removeProperty('width');
+}
+function displayLoadingSign() {
+    appUI.poemElement.innerText = 'Loading...';
 }
 makeDatalist();
