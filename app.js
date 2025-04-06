@@ -1,7 +1,18 @@
-const poemElement = document.getElementById('poetry');
-const poemNum = document.getElementById('num');
-let poemTitle = '';
 const usedPoems = [];
+const appUI = {
+    randomButton: document.getElementById('random'),
+    enterButton: document.getElementById('submit'),
+    madlibsButton: document.getElementById('madlibs'),
+    goButton: document.createElement('button'),
+    cancelButton: document.createElement('button'),
+    inputAuthor: document.getElementById('author'),
+    poemElement: document.getElementById('poetry'),
+    poemNum: document.getElementById('num'),
+}
+const typeStatus = {
+    timerId: null,
+    typing: false,
+}
 
 async function getPoem(author) {
     if (!author) {
@@ -17,31 +28,43 @@ async function getPoem(author) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        let poemCount = json.length; // count of all the returned poems
+        let poemCount = json.length; // count of all the author's poems
 
+        let random = 0;
+        let poemTitle = '';
         do {
-            let random = Math.floor(Math.random() * poemCount);
+            random = Math.floor(Math.random() * poemCount);
             poemTitle = json[random].title;
-        } while (usedPoems.contains(poemTitle));
+        } while (usedPoems.includes(poemTitle));
         usedPoems.push(poemTitle);
         
-        displayTitle();
-        let poemAuthor = json[random].author;
+        const poemObject = {
+            author: json[random].author,
+            lines: json[random].lines,
+            title: json[random].title,
+            random: random,
+            poemCount: poemCount,
+        } 
+        console.log(poemObject.lines);
+        return poemObject;
 
-        let poemLines = json[random].lines;
-
-        typeText(poemLines);
-
-            poemNum.innerText = `${random + 1} of ${poemCount} (${poemAuthor})`;
     } catch (error) {
         console.error('Fetch error:', error);
-        poemElement.innerText = 'Failed to load poem';
+        appUI.poemElement.innerText = 'Failed to load poem';
     }
 }
-
-
-let timerId;
-let currentlyTyping = false;
+function buildPoem(poemObj) {
+    displayTitle(poemObj);
+    displayNumber(poemObj);
+    typeText(poemObj.lines);
+}
+function displayNumber(poemObj) {
+    appUI.poemNum.innerText = `${poemObj.random + 1} of ${poemObj.poemCount} (${poemObj.author})`
+}
+function displayTitle(poemObj) {
+    let titleHeader = document.getElementById('poem-title');
+    titleHeader.innerText = poemObj.title;
+}
 
 function typeText(poemLines) {
     let print = '';
@@ -50,7 +73,7 @@ function typeText(poemLines) {
     let variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
     function type() {
         if (lineIndex < poemLines.length) {
-            currentlyTyping = true;
+            typeStatus.typing = true;
             if (charIndex < poemLines[lineIndex].length) {
                 print += poemLines[lineIndex][charIndex];
                 charIndex++;
@@ -65,14 +88,14 @@ function typeText(poemLines) {
                 lineIndex++;
                 variedSpeed = 300;
             }
-            poemElement.innerText = print;
+            appUI.poemElement.innerText = print;
 
-            timerId = setTimeout(type, variedSpeed);
+            typeStatus.timerId = setTimeout(type, variedSpeed);
             variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
         }
     }
     type();
-    currentlyTyping = false;
+    typeStatus.typing = false;
 }
 
 function pickRandomAuthor() {
@@ -81,22 +104,21 @@ function pickRandomAuthor() {
     return datalistAuthors[random];
 }
 async function randomPress() {
-    if (currentlyTyping) clearTimeout(timerId);
-    const randomButton = document.getElementById('random');
+    if (typeStatus.typing) clearTimeout(typeStatus.timerId);
+    const randomButton = appUI.randomButton;
     randomButton.style.visibility = 'hidden';
-    await getPoem();
+    let poemObj = await getPoem();
+    buildPoem(poemObj);
     randomButton.style.visibility = 'visible';
 }
-function displayTitle() {
-    let titleHeader = document.getElementById('poem-title');
-    titleHeader.innerText = poemTitle;
-}
 
-function lookPoet() {
-    if (currentlyTyping) clearTimeout(timerId);
+// appUI.enterButton.addEventListener('click', runPoetryMachine);
+async function runPoetryMachine() {
+    if (typeStatus.typing) clearTimeout(typeStatus.timerId);
     let input = document.getElementById('author');
     let userEntry = input.value;
-    getPoem(userEntry);
+    let poemObj = await getPoem(userEntry);
+    buildPoem(poemObj);
     input.value = '';
 }
 
@@ -126,15 +148,6 @@ async function makeDatalist() {
         datalist.appendChild(option);
         datalistAuthors.push(author);
     }
-}
-
-let appUI = {
-    randomButton: document.getElementById('random'),
-    enterButton: document.getElementById('submit'),
-    madlibsButton: document.getElementById('madlibs'),
-    goButton: document.createElement('button'),
-    cancelButton: document.createElement('button'),
-    inputAuthor: document.getElementById('author'),
 }
 
 function runMadlibs() {
