@@ -150,8 +150,12 @@ async function makeDatalist() {
 }
 
 function createMadlibsUI() {
+    if (typeStatus.typing) clearTimeout(typeStatus.timerId);
+
     appUI.titleHeader.innerText = 'Madlibs!';
     appUI.titleHeader.style.fontFamily = 'Barriecito';
+
+    appUI.poemNum.style.visibility = 'hidden';
 
     appUI.poemElement.innerText = 'Create a franken-poem with random lines of poetry!';
 
@@ -195,7 +199,7 @@ async function getMadlibsPoem(lineNum) {
             do {
                 Math.floor(Math.random() * lineCount);
                 pickedLine = poemObj['lines'][random];
-            } while ( pickedLine === '' && pickedLine.length === 1);
+            } while (pickedLine === '' || pickedLine.length === 1);
         } else { 
             do { // allow line breaks between first and last lines
                 Math.floor(Math.random() * lineCount);
@@ -215,7 +219,6 @@ async function buildMadlibsPoem() {
     } else {
         displayLoadingSign();
         appUI.inputAuthor.value = undefined;
-        appUI.poemNum.style.visibility = 'hidden';
         const arr = await getMadlibsPoem(lineNum);
         typeText(arr);
     }
@@ -225,7 +228,9 @@ function cancelMadlibs() {
     appUI.titleHeader.style.fontFamily = 'Italianno';
     appUI.titleHeader.innerText = 'Go ahead...';
 
-    appUI.poemElement.innerText = 'Enter an author or get a random poem!';
+    if (!typeStatus.typing) {
+        appUI.poemElement.innerText = 'Enter an author or get a random poem!';
+    }
     
     appUI.randomButton.style.display = 'block';
     appUI.enterButton.style.display = 'block';
