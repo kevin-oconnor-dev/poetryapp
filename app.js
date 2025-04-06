@@ -153,6 +153,8 @@ function createMadlibsUI() {
     appUI.titleHeader.innerText = 'Madlibs!';
     appUI.titleHeader.style.fontFamily = 'Barriecito';
 
+    appUI.poemElement.innerText = 'Create a franken-poem with random lines of poetry!';
+
     appUI.randomButton.style.display = 'none';
     appUI.enterButton.style.display = 'none';
     appUI.madlibsButton.style.display = 'none';
@@ -222,6 +224,8 @@ async function buildMadlibsPoem() {
 function cancelMadlibs() {
     appUI.titleHeader.style.fontFamily = 'Italianno';
     appUI.titleHeader.innerText = 'Go ahead...';
+
+    appUI.poemElement.innerText = 'Enter an author or get a random poem!';
     
     appUI.randomButton.style.display = 'block';
     appUI.enterButton.style.display = 'block';
