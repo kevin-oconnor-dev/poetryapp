@@ -79,9 +79,10 @@ function typeText(poemLines) {
     let print = '';
     let lineIndex = 0;
     let charIndex = 0;
+    let linesActual = 0;
     let variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
     function type() {
-        if (lineIndex < poemLines.length && lineIndex < appUI.lineLimit.value) {
+        if (lineIndex < poemLines.length && linesActual < appUI.lineLimit.value) {
             typeStatus.typing = true;
             if (charIndex < poemLines[lineIndex].length) {
                 print += poemLines[lineIndex][charIndex];
@@ -95,6 +96,7 @@ function typeText(poemLines) {
                 print += '\n';
                 charIndex = 0;
                 lineIndex++;
+                linesActual++;
                 variedSpeed = 300;
             }
             appUI.poemElement.innerText = print;
