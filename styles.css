@@ -48,7 +48,30 @@ h1 {
 }
 #num {
     margin: 1vw 0 0 2vw;
+    padding: 0 5px;
 }
+#max-line {
+    width: fit-content;
+    margin: 1vw 0 0 2vw;
+    padding: 5px;
+    border-radius: 5px;
+}
+#max-line:hover {
+    background-color: grey;
+    cursor: pointer;
+}
+/* remove input arrows on Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* remove input arrows on Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: initial;
+}
+
 button {
     border: none;
     padding: 0.5em;

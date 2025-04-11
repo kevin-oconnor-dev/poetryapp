@@ -9,6 +9,10 @@ const appUI = {
     poemElement: document.getElementById('poetry'),
     poemNum: document.getElementById('num'),
     titleHeader: document.getElementById('poem-title'),
+    lineLimit: {
+        element: document.getElementById('max-line'),
+        value: null,
+    },
 }
 const typeStatus = {
     timerId: null,
@@ -31,14 +35,8 @@ async function getPoem(author) {
         }
         let poemCount = json.length; // count of all the author's poems
 
-        let random = 0;
-        let poemTitle = '';
-        do {
-            random = Math.floor(Math.random() * poemCount);
-            poemTitle = json[random].title;
-        } while (usedPoems.includes(poemTitle));
-        usedPoems.push(poemTitle);
-        
+        let random = pickPoem(json, poemCount);
+
         const poemObject = {
             author: json[random].author,
             lines: json[random].lines,
@@ -53,6 +51,17 @@ async function getPoem(author) {
         console.error('Fetch error:', error);
         appUI.poemElement.innerText = 'Failed to load poem';
     }
+}
+function pickPoem(json, poemCount) {
+    let random;
+    let poemTitle;
+    do {
+        random = Math.floor(Math.random() * poemCount);
+        poemTitle = json[random].title;
+    } while ( usedPoems.includes(poemTitle) );
+
+    usedPoems.push(poemTitle);
+    return random;
 }
 function buildPoem(poemObj) {
     displayTitle(poemObj);
@@ -72,7 +81,7 @@ function typeText(poemLines) {
     let charIndex = 0;
     let variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
     function type() {
-        if (lineIndex < poemLines.length) {
+        if (lineIndex < poemLines.length && lineIndex < appUI.lineLimit.value) {
             typeStatus.typing = true;
             if (charIndex < poemLines[lineIndex].length) {
                 print += poemLines[lineIndex][charIndex];
@@ -190,26 +199,33 @@ function createMadlibsUI() {
 
 async function getMadlibsPoem(lineNum) {
     const assembledLines = [];
-    for (let i = 0; i < lineNum; i++) {
-        const poemObj = await getPoem();
-        const lineCount = poemObj['lines'].length
-        const random = 0;
-        let pickedLine = '';
-        if (i === 0 || i === lineNum - 1) {
-            do {
-                Math.floor(Math.random() * lineCount);
-                pickedLine = poemObj['lines'][random];
-            } while (pickedLine === '' || pickedLine.length === 1);
-        } else { 
-            do { // allow line breaks between first and last lines
-                Math.floor(Math.random() * lineCount);
-                pickedLine = poemObj['lines'][random];
-            } while ( pickedLine.length === 1); 
+    try {
+        for (let i = 0; i < lineNum; i++) {
+            const poemObj = await getPoem();
+            const lineCount = poemObj.lines.length
+            console.log('line count: ' + lineCount);
+            const random = 0;
+            let pickedLine = '';
+            if (i === 0 || i === lineNum - 1) {
+                do {
+                    Math.floor(Math.random() * lineCount);
+                    pickedLine = poemObj.lines[random];
+                } while (pickedLine === '' || pickedLine.length === 1);
+            } else { 
+                do { // allow line breaks between first and last lines
+                    Math.floor(Math.random() * lineCount);
+                    pickedLine = poemObj.lines[random];
+                } while ( pickedLine.length === 1); 
+            }
+            console.log(`picked line ${i}: ${pickedLine}`);
+            assembledLines.push(pickedLine);
         }
-        assembledLines.push(pickedLine);
+        console.log(assembledLines);
+        return assembledLines;
+    } catch {
+        new Error('Fetch error');
+        console.log('madlibs fetch error');
     }
-    console.log(assembledLines);
-    return assembledLines;
 }
 async function buildMadlibsPoem() {
     if (typeStatus.typing) clearTimeout(typeStatus.timerId);
@@ -236,6 +252,10 @@ function cancelMadlibs() {
     appUI.enterButton.style.display = 'block';
     appUI.madlibsButton.style.display = 'block';
 
+    appUI.poemNum.style.visibility = 'visible';
+    appUI.poemNum.innerText = '';
+
+
     appUI.cancelButton.style.display = 'none';
     appUI.goButton.style.display = 'none';
 
@@ -247,4 +267,31 @@ function cancelMadlibs() {
 function displayLoadingSign() {
     appUI.poemElement.innerText = 'Loading...';
 }
+
+function openLineLimit() {
+    appUI.lineLimit.element.onclick = '';
+    appUI.lineLimit.element.innerText = 'Line limit: '
+    const input = document.createElement('input');
+    input.style.width = '5vw';
+    input.value = appUI.lineLimit.value;
+    input.setAttribute('type', 'number');
+    appUI.lineLimit.element.appendChild(input);
+    input.focus();
+    input.addEventListener('blur', () => {
+        appUI.lineLimit.value = input.value;
+        input.remove()
+        if (!+appUI.lineLimit.value) {
+            appUI.lineLimit.element.innerText = 'Line limit: none';
+            appUI.lineLimit.value = null;
+        } else if (appUI.lineLimit.value > 999) {
+            appUI.lineLimit.element.innerText = 'Line limit: 999';
+            appUI.lineLimit.value = 999;
+        } else {
+            appUI.lineLimit.element.innerText = 'Line limit: ' + appUI.lineLimit.value;
+        }
+    })
+    appUI.lineLimit.element.onclick = openLineLimit;
+}
+
+
 makeDatalist();
