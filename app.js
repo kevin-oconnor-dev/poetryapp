@@ -11,7 +11,8 @@ const appUI = {
     titleHeader: document.getElementById('poem-title'),
     lineLimit: {
         element: document.getElementById('max-line'),
-        value: null,
+        value: 0,
+        storage: 0,
     },
 }
 const typeStatus = {
@@ -81,8 +82,12 @@ function typeText(poemLines) {
     let charIndex = 0;
     let linesActual = 0;
     let variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
+    let lineLimit = appUI.lineLimit.value;
+
+    if (lineLimit === 0) lineLimit = 1000;
+    
     function type() {
-        if (lineIndex < poemLines.length && linesActual < appUI.lineLimit.value) {
+        if (lineIndex < poemLines.length && linesActual < lineLimit) {
             typeStatus.typing = true;
             if (charIndex < poemLines[lineIndex].length) {
                 print += poemLines[lineIndex][charIndex];
@@ -167,6 +172,10 @@ function createMadlibsUI() {
     appUI.titleHeader.style.fontFamily = 'Barriecito';
 
     appUI.poemNum.style.visibility = 'hidden';
+
+    appUI.lineLimit.element.style.visibility = 'hidden';
+    appUI.lineLimit.storage = appUI.lineLimit.value;
+    appUI.lineLimit.value = 999;
 
     appUI.poemElement.innerText = 'Create a franken-poem with random lines of poetry!';
 
@@ -257,6 +266,8 @@ function cancelMadlibs() {
     appUI.poemNum.style.visibility = 'visible';
     appUI.poemNum.innerText = '';
 
+    appUI.lineLimit.element.style.visibility = 'visible';
+    appUI.lineLimit.value = appUI.lineLimit.storage;
 
     appUI.cancelButton.style.display = 'none';
     appUI.goButton.style.display = 'none';
@@ -275,7 +286,7 @@ function openLineLimit() {
     appUI.lineLimit.element.innerText = 'Line limit: '
     const input = document.createElement('input');
     input.style.width = '5vw';
-    input.value = appUI.lineLimit.value;
+    if (+appUI.lineLimit.value) input.value = appUI.lineLimit.value;
     input.setAttribute('type', 'number');
     appUI.lineLimit.element.appendChild(input);
     input.focus();
@@ -284,7 +295,7 @@ function openLineLimit() {
         input.remove()
         if (!+appUI.lineLimit.value) {
             appUI.lineLimit.element.innerText = 'Line limit: none';
-            appUI.lineLimit.value = null;
+            appUI.lineLimit.value = 0;
         } else if (appUI.lineLimit.value > 999) {
             appUI.lineLimit.element.innerText = 'Line limit: 999';
             appUI.lineLimit.value = 999;
