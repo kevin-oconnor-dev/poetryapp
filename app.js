@@ -1,5 +1,6 @@
 const usedPoems = [];
 const appUI = {
+    datalist: document.getElementById('datalist'),
     randomButton: document.getElementById('random'),
     enterButton: document.getElementById('submit'),
     madlibsButton: document.getElementById('madlibs'),
@@ -14,6 +15,7 @@ const appUI = {
         value: 0,
         storage: 0,
     },
+    datalistAuthors: [],
 }
 const typeStatus = {
     timerId: null,
@@ -22,7 +24,7 @@ const typeStatus = {
 
 async function getPoem(author) {
     if (!author) {
-        if (!datalistAuthors) {
+        if (!appUI.datalistAuthors) {
             await makeDatalist();
         }
         author = pickRandomAuthor();
@@ -49,10 +51,41 @@ async function getPoem(author) {
         return poemObject;
 
     } catch (error) {
-        console.error('Fetch error:', error);
-        appUI.poemElement.innerText = 'Failed to load poem';
+        console.error('getPoem fetch error:', error);
+        appUI.poemElement.innerText = 'Uh-oh! There was an error loading the poem...';
     }
 }
+
+async function makeDatalist() {
+    let authors = await getAllAuthors();
+    for (let author of authors) {
+        let option = document.createElement('option');
+        option.value = author;
+        appUI.datalist.appendChild(option);
+        appUI.datalistAuthors.push(author);
+    }
+}
+async function getAllAuthors() {
+    let url = 'https://poetrydb.org/author';
+    try {
+        let response = await fetch(url);
+        let json = await response.json();
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        return json.authors;
+
+    } catch (error) {
+        console.error('getAllAuthors fetch error:', error);
+    }
+}
+
+function pickRandomAuthor() {
+    let length = appUI.datalistAuthors.length;
+    let random = Math.floor( Math.random() * length );
+    return appUI.datalistAuthors[random];
+}
+
 function pickPoem(json, poemCount) {
     let random;
     let poemTitle;
@@ -64,11 +97,13 @@ function pickPoem(json, poemCount) {
     usedPoems.push(poemTitle);
     return random;
 }
+
 function buildPoem(poemObj) {
     displayTitle(poemObj);
     displayNumber(poemObj);
     typeText(poemObj.lines);
 }
+
 function displayNumber(poemObj) {
     appUI.poemNum.innerText = `${poemObj.random + 1} of ${poemObj.poemCount} (${poemObj.author})`
 }
@@ -80,11 +115,11 @@ function typeText(poemLines) {
     let print = '';
     let lineIndex = 0;
     let charIndex = 0;
-    let linesActual = 0;
+    let linesActual = 0; // line count excluding blanks
     let variedSpeed = Math.floor(Math.random() * (60 - 50 + 1) + 50);
     let lineLimit = appUI.lineLimit.value;
 
-    if (lineLimit === 0) lineLimit = 1000;
+    if (lineLimit === 0) lineLimit = 999;
     
     function type() {
         if (lineIndex < poemLines.length && linesActual < lineLimit) {
@@ -101,8 +136,8 @@ function typeText(poemLines) {
                 print += '\n';
                 charIndex = 0;
                 lineIndex++;
-                linesActual++;
-                variedSpeed = 300;
+                linesActual++; // only lines with text count toward linesActual
+                variedSpeed = 300; // pause after each line
             }
             appUI.poemElement.innerText = print;
 
@@ -114,11 +149,6 @@ function typeText(poemLines) {
     typeStatus.typing = false;
 }
 
-function pickRandomAuthor() {
-    let length = datalistAuthors.length;
-    let random = Math.floor( Math.random() * length );
-    return datalistAuthors[random];
-}
 async function randomPress() {
     if (typeStatus.typing) clearTimeout(typeStatus.timerId);
     const randomButton = appUI.randomButton;
@@ -135,34 +165,6 @@ async function runPoetryMachine() {
     let poemObj = await getPoem(userEntry);
     buildPoem(poemObj);
     input.value = '';
-}
-
-async function getAllAuthors() {
-    let url = 'https://poetrydb.org/author';
-    try {
-        let response = await fetch(url);
-        let json = await response.json();
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-        return json.authors;
-
-    } catch (error) {
-        console.error('All authors fetch error:', error);
-    }
-}
-
-const datalist = document.getElementById('datalist');
-let datalistAuthors = [];
-
-async function makeDatalist() {
-    let authors = await getAllAuthors();
-    for (let author of authors) {
-        let option = document.createElement('option');
-        option.value = author;
-        datalist.appendChild(option);
-        datalistAuthors.push(author);
-    }
 }
 
 function createMadlibsUI() {
@@ -213,31 +215,33 @@ async function getMadlibsPoem(lineNum) {
     try {
         for (let i = 0; i < lineNum; i++) {
             const poemObj = await getPoem();
-            const lineCount = poemObj.lines.length
+            const lineCount = poemObj.lines.length;
             console.log('line count: ' + lineCount);
-            const random = 0;
+            let random = 0;
             let pickedLine = '';
             if (i === 0 || i === lineNum - 1) {
                 do {
-                    Math.floor(Math.random() * lineCount);
+                    random = Math.floor(Math.random() * lineCount);
+                    console.log(`random: ${random}`);
                     pickedLine = poemObj.lines[random];
                 } while (pickedLine === '' || pickedLine.length === 1);
             } else { 
                 do { // allow line breaks between first and last lines
-                    Math.floor(Math.random() * lineCount);
+                    random = Math.floor(Math.random() * lineCount);
+                    console.log(`random (first or last): ${random}`);
                     pickedLine = poemObj.lines[random];
                 } while ( pickedLine.length === 1); 
             }
-            console.log(`picked line ${i}: ${pickedLine}`);
+            console.log(`picked line ${i + 1}: ${pickedLine}`);
             assembledLines.push(pickedLine);
         }
         console.log(assembledLines);
         return assembledLines;
-    } catch {
-        new Error('Fetch error');
-        console.log('madlibs fetch error');
+    } catch(err) {
+        console.error(`Madlibs fetch error: ${err}`);
     }
 }
+
 async function buildMadlibsPoem() {
     if (typeStatus.typing) clearTimeout(typeStatus.timerId);
     let lineNum = appUI.inputAuthor.value;
@@ -245,10 +249,13 @@ async function buildMadlibsPoem() {
         alert('max length is 8!');
     } else {
         displayLoadingSign();
-        appUI.inputAuthor.value = undefined;
+        appUI.inputAuthor.value = null;
         const arr = await getMadlibsPoem(lineNum);
         typeText(arr);
     }
+}
+function displayLoadingSign() {
+    appUI.poemElement.innerText = 'Loading...';
 }
 
 function cancelMadlibs() {
@@ -277,9 +284,6 @@ function cancelMadlibs() {
     appUI.inputAuthor.setAttribute('list', 'datalist');
     appUI.inputAuthor.style.removeProperty('width');
 }
-function displayLoadingSign() {
-    appUI.poemElement.innerText = 'Loading...';
-}
 
 function openLineLimit() {
     appUI.lineLimit.element.onclick = '';
@@ -305,6 +309,5 @@ function openLineLimit() {
     })
     appUI.lineLimit.element.onclick = openLineLimit;
 }
-
 
 makeDatalist();
