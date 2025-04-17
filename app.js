@@ -105,7 +105,13 @@ function buildPoem(poemObj) {
 }
 
 function displayNumber(poemObj) {
-    appUI.poemNum.innerText = `${poemObj.random + 1} of ${poemObj.poemCount} (${poemObj.author})`
+    let authorLink = document.createElement('a');
+    authorLink.href = `https://en.wikipedia.org/wiki/${poemObj.author}`;
+    authorLink.innerText = poemObj.author;
+    authorLink.target = '_blank';
+    appUI.poemNum.innerText = `${poemObj.random + 1} of ${poemObj.poemCount} (`;
+    appUI.poemNum.appendChild(authorLink);
+    appUI.poemNum.append(')');
 }
 function displayTitle(poemObj) {
     if (poemObj.title.length > 35) {
@@ -266,10 +272,8 @@ function displayLoadingSign() {
 function cancelMadlibs() {
     appUI.titleHeader.style.fontFamily = 'Funnel Display';
     appUI.titleHeader.innerText = 'Go ahead...';
-
-    if (!typeStatus.typing) {
-        appUI.poemElement.innerText = 'Enter an author or get a random poem!';
-    }
+    
+    appUI.poemElement.innerText = 'Enter an author or get a random poem!';
     
     appUI.randomButton.style.display = 'block';
     appUI.enterButton.style.display = 'block';

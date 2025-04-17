@@ -63,6 +63,12 @@ h1 {
     margin: 1vw 0 0 2vw;
     padding: 0 5px;
 }
+#num a {
+    text-decoration: none;
+}
+#num a:hover {
+    color: black;
+}
 #max-line {
     width: fit-content;
     margin: 1vw 0 0 2vw;
