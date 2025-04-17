@@ -18,10 +18,13 @@ h1 {
 }
 #poem-title {
     margin: 2vw 0 1vw 0;
-    font-family: 'Italianno';
+    font-family: 'Funnel Display';
     font-weight: normal;
-    font-size: clamp(30px, 7vw, 80px);
+    font-size: clamp(30px, 5vw, 80px);
     text-align: center;
+}
+#poem-title.large-title {
+    font-size: clamp(30px, 3vw, 80px);
 }
 
 #poetry {

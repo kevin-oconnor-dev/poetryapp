@@ -108,6 +108,11 @@ function displayNumber(poemObj) {
     appUI.poemNum.innerText = `${poemObj.random + 1} of ${poemObj.poemCount} (${poemObj.author})`
 }
 function displayTitle(poemObj) {
+    if (poemObj.title.length > 35) {
+        appUI.titleHeader.classList.add('large-title');
+    } else {
+        appUI.titleHeader.classList.remove('large-title');
+    }
     appUI.titleHeader.innerText = poemObj.title;
 }
 
@@ -259,7 +264,7 @@ function displayLoadingSign() {
 }
 
 function cancelMadlibs() {
-    appUI.titleHeader.style.fontFamily = 'Italianno';
+    appUI.titleHeader.style.fontFamily = 'Funnel Display';
     appUI.titleHeader.innerText = 'Go ahead...';
 
     if (!typeStatus.typing) {
