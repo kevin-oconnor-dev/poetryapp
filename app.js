@@ -36,25 +36,26 @@ async function getPoem(author) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        let poemCount = json.length; // count of all the author's poems
-
-        let random = pickPoem(json, poemCount);
-
-        const poemObject = {
-            author: json[random].author,
-            lines: json[random].lines,
-            title: json[random].title,
-            random: random,
-            poemCount: poemCount,
-        } 
-        console.log(poemObject.lines);
-        return poemObject;
-
+        return json;
     } catch (error) {
         console.error('getPoem fetch error:', error);
         appUI.poemElement.innerText = 'Uh-oh! There was an error loading the poem...';
     }
 }
+
+function makePoemObject(json) {
+    let poemCount = json.length; // count of all the author's poems
+    let random = pickPoem(json, poemCount);
+    const poemObject = {
+        author: json[random].author,
+        lines: json[random].lines,
+        title: json[random].title,
+        random: random,
+        poemCount: poemCount,
+    } 
+    console.log(poemObject.lines);
+    return poemObject;
+} 
 
 async function makeDatalist() {
     let authors = await getAllAuthors();
@@ -164,7 +165,8 @@ async function randomPress() {
     if (typeStatus.typing) clearTimeout(typeStatus.timerId);
     const randomButton = appUI.randomButton;
     randomButton.style.visibility = 'hidden';
-    let poemObj = await getPoem();
+    let json = await getPoem();
+    let poemObj = makePoemObject(json);
     buildPoem(poemObj);
     randomButton.style.visibility = 'visible';
 }
@@ -173,7 +175,8 @@ async function runPoetryMachine() {
     if (typeStatus.typing) clearTimeout(typeStatus.timerId);
     let input = document.getElementById('author');
     let userEntry = input.value;
-    let poemObj = await getPoem(userEntry);
+    let json = await getPoem(userEntry);
+    let poemObj = makePoemObject(json);
     buildPoem(poemObj);
     input.value = '';
 }
@@ -225,7 +228,8 @@ async function getMadlibsPoem(lineNum) {
     const assembledLines = [];
     try {
         for (let i = 0; i < lineNum; i++) {
-            const poemObj = await getPoem();
+            let json = await getPoem();
+            let poemObj = makePoemObject(json);
             const lineCount = poemObj.lines.length;
             console.log('line count: ' + lineCount);
             let random = 0;
