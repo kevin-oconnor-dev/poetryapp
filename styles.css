@@ -59,14 +59,14 @@ h1 {
     align-items: center;
     gap: 1vw;
 }
-#num {
+#author-cont {
     margin: 1vw 0 0 2vw;
     padding: 0 5px;
 }
-#num a {
+#author-link {
     text-decoration: none;
 }
-#num a:hover {
+#author-link:hover {
     color: black;
 }
 #max-line {

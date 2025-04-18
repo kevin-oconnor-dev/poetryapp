@@ -8,7 +8,7 @@ const appUI = {
     cancelButton: document.createElement('button'),
     inputAuthor: document.getElementById('author'),
     poemElement: document.getElementById('poetry'),
-    poemNum: document.getElementById('num'),
+    poemAuthor: document.getElementById('author-link'),
     titleHeader: document.getElementById('poem-title'),
     lineLimit: {
         element: document.getElementById('max-line'),
@@ -83,18 +83,14 @@ async function getAllAuthors() {
 
 function buildPoem(poemObj) {
     displayTitle(poemObj);
-    displayNumber(poemObj);
+    displayAuthor(poemObj);
     typeText(poemObj.lines);
 }
 
-function displayNumber(poemObj) {
-    let authorLink = document.createElement('a');
-    authorLink.href = `https://en.wikipedia.org/wiki/${poemObj.author}`;
-    authorLink.innerText = poemObj.author;
-    authorLink.target = '_blank';
-    appUI.poemNum.innerText = `${poemObj.random + 1} of ${poemObj.poemCount} (`;
-    appUI.poemNum.appendChild(authorLink);
-    appUI.poemNum.append(')');
+function displayAuthor(poemObj) {
+    appUI.poemAuthor.href = `https://en.wikipedia.org/wiki/${poemObj.author}`;
+    appUI.poemAuthor.innerText = poemObj.author;
+    appUI.poemAuthor.target = '_blank';
 }
 function displayTitle(poemObj) {
     console.log(poemObj);
