@@ -165,7 +165,7 @@ function createMadlibsUI() {
     appUI.titleHeader.innerText = 'Madlibs!';
     appUI.titleHeader.style.fontFamily = 'Barriecito';
 
-    appUI.poemNum.style.visibility = 'hidden';
+    appUI.poemAuthor.style.visibility = 'hidden';
 
     appUI.lineLimit.element.style.visibility = 'hidden';
     appUI.lineLimit.storage = appUI.lineLimit.value;
@@ -281,8 +281,8 @@ function cancelMadlibs() {
     appUI.enterButton.style.display = 'block';
     appUI.madlibsButton.style.display = 'block';
 
-    appUI.poemNum.style.visibility = 'visible';
-    appUI.poemNum.innerText = '';
+    appUI.poemAuthor.style.visibility = 'visible';
+    appUI.poemAuthor.innerText = '';
 
     appUI.lineLimit.element.style.visibility = 'visible';
     appUI.lineLimit.value = appUI.lineLimit.storage;
