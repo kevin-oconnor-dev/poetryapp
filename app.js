@@ -201,7 +201,12 @@ function createMadlibsUI() {
     appUI.inputAuthor.style.width = '13vw';
     appUI.inputAuthor.setAttribute('max','8');
 }
-
+class FetchError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'FetchError';
+    }
+}
 async function getMadlibsPoems(lineNum) {
     const madlibsPoems = [];
 
@@ -214,12 +219,16 @@ async function getMadlibsPoems(lineNum) {
             const poemObj = await getPoem(undefined, signal);
             clearTimeout(timerId);
 
-            if (!poemObj) throw new Error(`poem ${i} of madlibs failed`);
+            if (!poemObj) throw new FetchError(`poem ${i} of madlibs failed`);
 
             madlibsPoems.push(poemObj);
         }
     } catch(err) {
-        console.error(`Madlibs fetch error: ${err}`);
+        if (err instanceof FetchError) {
+            console.error(`Madlibs fetch error: ${err}`);
+        } else {
+            throw err;
+        }
     }
     console.log('madlibsPoems array: ' + JSON.stringify(madlibsPoems));
     return madlibsPoems;
