@@ -43,17 +43,16 @@ async function getPoem(author, signal) {
 
 
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
+            throw new FetchError(`Response status: ${response.status}`);
         }
-        console.log(jsonPoem);
-        return {
-            author: jsonPoem.author,
-            lines: jsonPoem.lines,
-            title: jsonPoem.title,
-        };
-    } catch (error) {
-        console.error('getPoem fetch error:', error);
-        appUI.poemElement.innerText = 'Uh-oh! There was an error loading the poem...';
+        return jsonPoem;
+    } catch (err) {
+        if (err instanceof FetchError) {
+            console.error('getPoem fetch error:', error);
+            appUI.poemElement.innerText = 'Uh-oh! There was an error loading the poem...';
+        } else {
+            throw err;
+        }
     }
 }
 
@@ -201,28 +200,38 @@ function createMadlibsUI() {
     appUI.inputAuthor.style.width = '13vw';
     appUI.inputAuthor.setAttribute('max','8');
 }
+
 class FetchError extends Error {
     constructor(message) {
         super(message);
         this.name = 'FetchError';
     }
 }
+
 async function getMadlibsPoems(lineNum) {
-    const madlibsPoems = [];
+    const urls = [];
+    const poems = [];
+    for (let i = 0; i < lineNum; i++) {
+        urls.push('https://poetrydb.org/random');
+    }
 
+    const controller = new AbortController();
+    const signal = controller.signal;
     try {
-        for (let i = 0; i < lineNum; i++) {
-            const controller = new AbortController();
-            const signal = controller.signal;
-
-            const timerId = setTimeout( () => controller.abort(), 5000);
-            const poemObj = await getPoem(undefined, signal);
-            clearTimeout(timerId);
-
-            if (!poemObj) throw new FetchError(`poem ${i} of madlibs failed`);
-
-            madlibsPoems.push(poemObj);
+        const timerId = setTimeout( () => {
+            controller.abort();
+            appUI.poemElement.innerText = 'Error: fetch timed out.';
+            console.error(`Fetch timed out`);
+        }, 5000);
+        
+        let responses = await Promise.all(urls.map( url => fetch(url, {signal}) ));
+        let jsons = await Promise.all(responses.map( response => response.json() ));
+        
+        for (let poemContainer of jsons) {
+            poems.push(poemContainer[0]);
         }
+        clearTimeout(timerId);
+        if (jsons.length !== lineNum) throw new FetchError('Madlibs fetch error');
     } catch(err) {
         if (err instanceof FetchError) {
             console.error(`Madlibs fetch error: ${err}`);
@@ -230,8 +239,7 @@ async function getMadlibsPoems(lineNum) {
             throw err;
         }
     }
-    console.log('madlibsPoems array: ' + JSON.stringify(madlibsPoems));
-    return madlibsPoems;
+    return poems;
 }
 
 function pickMadlibsLines(madlibsPoems, lineNum) {
@@ -265,7 +273,7 @@ function pickMadlibsLines(madlibsPoems, lineNum) {
 
 async function buildMadlibsPoem() {
     if (typeStatus.typing) clearTimeout(typeStatus.timerId);
-    let lineNum = appUI.inputAuthor.value;
+    let lineNum = Number(appUI.inputAuthor.value);
     if (lineNum > 8) {
         alert('max length is 8!');
     } else {
